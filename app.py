@@ -44,7 +44,7 @@ def main():
     # Sidebar for API key
     with st.sidebar:
         st.header("Settings")
-        api_key = st.text_input("Enter your API key:", value="st.session_state.api_key", type="password")
+        api_key = st.text_input("Demo API key:", value="st.session_state.api_key", type="password")
 
         
 
