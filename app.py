@@ -22,7 +22,7 @@ load_dotenv()  # Add verbose=True to see loading details
 def initialize_session_state():
     """Initialize session state variables."""
     if 'api_key' not in st.session_state:
-        st.session_state.api_key = os.getenv('BRIA_API_KEY')
+        st.session_state.api_key = "a934d0d37385418a8c91c70ab81f2347"
     if 'generated_images' not in st.session_state:
         st.session_state.generated_images = []
     if 'current_image' not in st.session_state:
@@ -44,36 +44,9 @@ def main():
     # Sidebar for API key
     with st.sidebar:
         st.header("Settings")
-        api_key = st.text_input("Enter your API key:", value="", type="password")
+        api_key = st.text_input("Enter your API key:", value="st.session_state.api_key", type="password")
 
-        sample_text = (
-            "For the Demo\n"
-            "API KEY = a934d0d37385418a8c91c70ab81f2347"
-        )
-
-        if st.button("Copy Demo API Key"):
-            # Using a small JS snippet inside a Streamlit component to copy text
-            components.html(f"""
-            <script>
-            const text = {json.dumps(sample_text)};
-            navigator.clipboard.writeText(text).then(() => {{
-                const el = document.createElement('div');
-                el.textContent = 'Sample text copied to clipboard';
-                el.style.position = 'fixed';
-                el.style.top = '10px';
-                el.style.right = '10px';
-                el.style.padding = '8px 12px';
-                el.style.background = '#4BB543';
-                el.style.color = 'white';
-                el.style.borderRadius = '4px';
-                el.style.zIndex = 999999;
-                document.body.appendChild(el);
-                setTimeout(()=>el.remove(),2000);
-            }}).catch(()=>{{
-                alert('Copy failed. Please copy manually: ' + text);
-            }});
-            </script>
-            """, height=0)
+        
 
     # Main tabs
     tabs = st.tabs([
