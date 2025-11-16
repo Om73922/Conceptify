@@ -1,4 +1,6 @@
 import streamlit as st
+import streamlit.components.v1 as components
+import json
 import os
 from dotenv import load_dotenv
 from services import (
@@ -14,15 +16,8 @@ st.set_page_config(
 )
 
 # Load environment variables
-print("Loading environment variables...")
-load_dotenv(verbose=True)  # Add verbose=True to see loading details
+load_dotenv()  # Add verbose=True to see loading details
 
-# Debug: Print environment variable status
-api_key = os.getenv("BRIA_API_KEY")
-print(f"API Key present: {bool(api_key)}")
-print(f"API Key value: {api_key if api_key else 'Not found'}")
-print(f"Current working directory: {os.getcwd()}")
-print(f".env file exists: {os.path.exists('.env')}")
 
 def initialize_session_state():
     """Initialize session state variables."""
@@ -49,9 +44,36 @@ def main():
     # Sidebar for API key
     with st.sidebar:
         st.header("Settings")
-        api_key = st.text_input("Enter your API key:", value=st.session_state.api_key if st.session_state.api_key else "", type="password")
-        if api_key:
-            st.session_state.api_key = api_key
+        api_key = st.text_input("Enter your API key:", value="", type="password")
+
+        sample_text = (
+            "For the Demo\n"
+            "API KEY = a934d0d37385418a8c91c70ab81f2347"
+        )
+
+        if st.button("Copy Demo API Key"):
+            # Using a small JS snippet inside a Streamlit component to copy text
+            components.html(f"""
+            <script>
+            const text = {json.dumps(sample_text)};
+            navigator.clipboard.writeText(text).then(() => {{
+                const el = document.createElement('div');
+                el.textContent = 'Sample text copied to clipboard';
+                el.style.position = 'fixed';
+                el.style.top = '10px';
+                el.style.right = '10px';
+                el.style.padding = '8px 12px';
+                el.style.background = '#4BB543';
+                el.style.color = 'white';
+                el.style.borderRadius = '4px';
+                el.style.zIndex = 999999;
+                document.body.appendChild(el);
+                setTimeout(()=>el.remove(),2000);
+            }}).catch(()=>{{
+                alert('Copy failed. Please copy manually: ' + text);
+            }});
+            </script>
+            """, height=0)
 
     # Main tabs
     tabs = st.tabs([
@@ -60,15 +82,18 @@ def main():
 
     # Generate Images Tab
     with tabs[0]:
-        st.header("Generate Images")
+        st.header("Generate Image(s)")
 
         col1, col2 = st.columns([2, 1])
         with col1:
             # Prompt input
-            prompt = st.text_area("Describe your concept (e.g. Photosynthesis, Ancient Rome market)",
-                                value="",
-                                height=100,
-                                key="prompt_input")
+            prompt = st.text_area(
+                "Describe your concept (e.g. Photosynthesis, Ancient Rome market)",
+                value="",
+                height=100,
+                key="prompt_input",
+                placeholder="Leaving this area blank will generate a random image."
+            )
 
         with col2:
             num_images = st.slider("Number of images", 1, 4, 1)
@@ -136,10 +161,10 @@ def main():
                                 image_data = get_image(result['result'][i]['urls'])
                             if image_data:
                                 st.image(image_data, caption='Downloaded image', use_column_width=True)
-                                print("Image displayed successfully in Streamlit.")
+                                #print("Image displayed successfully in Streamlit.")
                             else:
                                 st.warning(f"Could not display image {i + 1}.")
-                                print("Image data was None; no image displayed.")
+                                #print("Image data was None; no image displayed.")
 
                 except Exception as e:
                     st.error(f"Error generating images: {str(e)}")
